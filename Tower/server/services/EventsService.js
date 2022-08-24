@@ -1,6 +1,6 @@
-import { BadRequest, Forbidden } from "@bcwdev/auth0provider/lib/Errors"
-// NOTE                                  ^^^^ this may be pulling from the wrong file (might need utils/errors)
+import { BadRequest, Forbidden } from "../utils/Errors"
 import { dbContext } from "../db/DbContext"
+import { accountService } from "./AccountService"
 
 class EventsService{
   async getAll(){
@@ -22,11 +22,18 @@ class EventsService{
     return event
   }
 // NOTE THIS MIGHT NOT WORK, MIGHT NEED HELP...
-  async edit(id, eventData){
+  async edit(id, eventData, userId){
     const event = await this.getById(id)
     if(event.isCanceled == true){
       throw new BadRequest("You can't edit events that have been canceled!")
     }
+    if(event.creatorId.toString() != userId){
+      throw new Forbidden("You don't have permission to edit this event!")
+    }
+    // NOTE this doesn't work, ask if I need to have a bodyguard here.
+    // if(event.creatorId.toString() != userId){
+    //   throw new Forbidden("You don't have permission to edit this event!")
+    // }
     event.name = eventData.name || event.name
     event.description = eventData.description || event.description
     event.coverImg = eventData.coverImg || event.coverImg
@@ -46,7 +53,7 @@ class EventsService{
     }
     event.isCanceled = !event.isCanceled
     await event.save()
-    return `event ${event.name} was canceled.`
+    return `${event.name} was canceled.`
   }
 }
 

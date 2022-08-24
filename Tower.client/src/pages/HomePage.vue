@@ -1,17 +1,54 @@
 <template>
-  <div class="home flex-grow-1 d-flex flex-column align-items-center justify-content-center">
-    <div class="home-card p-5 bg-white rounded elevation-3">
-      <img src="https://bcw.blob.core.windows.net/public/img/8600856373152463" alt="CodeWorks Logo" class="rounded-circle">
-      <h1 class="my-5 bg-dark text-white p-3 rounded text-center">
-        Vue 3 Starter
-      </h1>
+  <div class="container-fluid">
+    <section class="row d-flex justify-content-around">
+      <div class="col-12">
+        filter <i class="mdi mdi-filter"></i>
+      </div>
+      <div class="col-2 btn btn-info" @click="filterTerm = ''">All</div>
+      <div class="col-2 btn btn-info" @click="filterTerm = 'concert'">Concerts</div>
+      <div class="col-2 btn btn-info" @click="filterTerm = 'convention'">Conventions</div>
+      <div class="col-2 btn btn-info" @click="filterTerm = 'sport'">Sports</div>
+      <div class="col-2 btn btn-info" @click="filterTerm = 'digital'">Digital</div>
+    </section>
+    <section class="row">
+    <div class="col-md-4" v-for="e in events" :key="e.id">
+      <EventCard :event="e"/>
     </div>
+    </section>
   </div>
 </template>
 
 <script>
+import { logger } from '../utils/Logger';
+import Pop from '../utils/Pop';
+import { eventsService } from '../services/EventsService.js';
+import { onMounted, ref} from 'vue';
+import { computed } from '@vue/reactivity';
+import { AppState } from '../AppState';
+import EventCard from '../components/EventCard.vue';
+
 export default {
-  name: 'Home'
+    name: "Home",
+    setup() {
+        const filterTerm = ref("");
+        async function getEvents() {
+            try {
+                await eventsService.getAll();
+            }
+            catch (error) {
+                logger.error("[Getting Events]", error);
+                Pop.error(error);
+            }
+        }
+        onMounted(() => {
+            getEvents();
+        });
+        return {
+            filterTerm,
+            events: computed(() => AppState.events.filter(e => filterTerm.value ? e.type == filterTerm.value : true)),
+        };
+    },
+    components: { EventCard }
 }
 </script>
 

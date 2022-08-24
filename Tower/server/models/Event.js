@@ -7,7 +7,7 @@ export const EventSchema = new Schema({
   description: {type: String, required: true, minlength: 2, maxlength: 1000},
   coverImg: {type: String, required: true, minlength: 3, maxlength: 250},
   location: {type: String, required: true, minlength: 3, maxlength: 35},
-  capacity: {type: Number, required: true, min: 1, max: 1000},
+  capacity: {type: Number, required: true, min: 0, max: 1000},
   // NOTE hopefully vvvv this works, if not figure it out... ASK IF I NEED MIN AND MAX ON HERE AND HOW TO DO IT
   startDate: {type: Date, required: true},
   type: {type: String, enum: ['concert', 'convention', 'sport', 'digital'], required: true, default: 'concert', lowercase: true},
