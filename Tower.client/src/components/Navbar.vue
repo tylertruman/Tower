@@ -6,7 +6,7 @@
         Tower
       </div>
     </router-link>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" title="Create Event">
   Create Event
 </button>
     <button
@@ -40,7 +40,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Create Event</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -76,7 +76,7 @@
             <label for="description" class="form-label">Event Description</label>
             <textarea v-model="editable.description" class="form-control" aria-label="eventDescription"></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary" title="Submit">Submit</button>
         </form>
       </div>
     </div>
@@ -85,6 +85,7 @@
 </template>
 
 <script>
+import { Modal } from 'bootstrap';
 import { ref } from 'vue';
 import { router } from '../router';
 import { eventsService } from '../services/EventsService';
@@ -102,6 +103,7 @@ export default {
           const event = await eventsService.createEvent(editable.value)
           router.push({name: 'EventDetails', params: {eventId: event.id}})
           editable.value = {}
+          Modal.getOrCreateInstance(document.getElementById('exampleModal')).hide()
         } catch (error) {
           logger.error('[Handling Submit]', error)
           Pop.error(error)

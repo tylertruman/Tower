@@ -2,13 +2,13 @@
   <div class="container-fluid">
     <section class="row d-flex justify-content-around">
       <div class="col-12">
-        filter <i class="mdi mdi-filter"></i>
+        filter <i class="mdi mdi-filter" title="Filter Icon"></i>
       </div>
-      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = ''">All</div>
-      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'concert'">Concerts</div>
-      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'convention'">Conventions</div>
-      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'sport'">Sports</div>
-      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'digital'">Digital</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = ''" title="All">All</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'concert'" title="Concerts">Concerts</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'convention'" title="Conventions">Conventions</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'sport'" title="Sports">Sports</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'digital'" title="Digital">Digital</div>
     </section>
     <section class="row">
     <div class="col-md-4" v-for="e in events" :key="e.id">

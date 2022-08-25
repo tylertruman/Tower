@@ -5,8 +5,8 @@
             <!-- PUT COMMENTS HERE -->
             <div class="row" v-for="c in comments" :key="c.id">
               <div class="mt-2">
-                <img :src="c.creator.picture" :title="c.creator.name" height="30" class="rounded-circle">
-                {{c.body}} - {{c.creator.name}} <i class="mdi mdi-delete selectable text-danger" @click="deleteComment(c)"></i>
+                <img :src="c.creator.picture" :title="c.creator.name" height="30" class="rounded-circle" alt="creator image">
+                {{c.body}} - {{c.creator.name}} <i class="mdi mdi-delete selectable text-danger" @click="deleteComment(c)" title="Delete Comment"></i>
               </div>
             </div>
           </div>
@@ -17,7 +17,7 @@
                 <textarea v-model="editable.body" class="form-control" id="comment" rows="3" placeholder="enter comment here..."></textarea>
               </div>
               <div class="text-end">
-              <button class="btn btn-info">Add Comment</button>
+              <button class="btn btn-info" title="Add Comment">Add Comment</button>
               </div>
             </form>
           </div>

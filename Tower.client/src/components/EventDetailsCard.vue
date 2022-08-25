@@ -2,23 +2,23 @@
 <div class="card elevation-1">
           <div v-if="!event.isCanceled && event.capacity >= 1" class="card-body">
             <div v-if="event.creatorId == account.id" class="text-center p-0 m-0">
-              <button @click="cancelEvent" class="btn btn-warning mb-3">Cancel Event</button>
+              <button @click="cancelEvent" class="btn btn-warning mb-3" title="Cancel Event">Cancel Event</button>
             </div>
-            <img class="img-fluid elevation-1 rounded" :src="event.coverImg" alt="">
+            <img class="img-fluid elevation-1 rounded" :src="event.coverImg" alt="event image">
             <p class="text-center mt-2">{{event.location}} - Tickets Available: {{event.capacity}}</p>
             <p class="text-center">{{event.type}} - {{new Date(event.startDate).toLocaleDateString('en-US', {
               month: 'short', day: 'numeric'
             })}}</p>
             <p>{{event.description}}</p>
             <div v-if="!hasTicket" class="text-center">
-            <button class="btn btn-info" @click="buyTicket">Buy Ticket</button>
+            <button class="btn btn-info" @click="buyTicket" title="Buy Ticket">Buy Ticket</button>
             </div>
             <div v-else class="text-center">
-            <button class="btn btn-danger" @click="sellTicket">Sell Ticket</button>
+            <button class="btn btn-danger" @click="sellTicket" title="Sell Ticket">Sell Ticket</button>
             </div>
           </div>
           <div v-if="event.isCanceled" class="card-body">
-            <img class="img-fluid canceled-img elevation-1 rounded" :src="event.coverImg" alt="">
+            <img class="img-fluid canceled-img elevation-1 rounded" :src="event.coverImg" alt="event image">
             <p class="text-center mt-2 text-decoration-line-through">{{event.location}} - Tickets Available: {{event.capacity}}</p>
             <p class="text-center text-decoration-line-through">{{event.type}} - {{new Date(event.startDate).toLocaleDateString('en-US', {
               month: 'short', day: 'numeric'
@@ -27,7 +27,7 @@
             <p class="text-center"><strong class="text-danger">Canceled</strong></p>
           </div>
           <div v-if="event.capacity == 0" class="card-body">
-            <img class="img-fluid canceled-img elevation-1 rounded" :src="event.coverImg" alt="">
+            <img class="img-fluid canceled-img elevation-1 rounded" :src="event.coverImg" alt="event image">
             <p class="text-center mt-2">{{event.location}} - Tickets Available: {{event.capacity}}</p>
             <p class="text-center">{{event.type}} - {{new Date(event.startDate).toLocaleDateString('en-US', {
               month: 'short', day: 'numeric'
@@ -52,37 +52,37 @@ setup() {
     account: computed(() => AppState.account),
     event: computed(() => AppState.activeEvent),
     hasTicket: computed(() => {
-                if (AppState.ticketProfiles.find(t => t.accountId == AppState.account.id)) {
-                    return true;
-                }
-                return false;
-            }),
+      if (AppState.ticketProfiles.find(t => t.accountId == AppState.account.id)) {
+        return true;
+      }
+        return false;
+    }),
     async buyTicket() {
-                try {
-                    let newTicket = {
-                        eventId: AppState.activeEvent.id,
-                        accountId: AppState.account.id
-                    };
-                    logger.log("buying the ticket", newTicket);
-                    await ticketsService.create(newTicket);
-                    AppState.activeEvent.capacity--;
-                }
-                catch (error) {
-                    logger.error("[Buying Ticket]", error);
-                    Pop.error(error);
-                }
-            },
-            async sellTicket() {
-                try {
-                    let ticketToSell = AppState.ticketProfiles.find(t => t.accountId == AppState.account.id);
-                    await ticketsService.sellTicket(ticketToSell.id);
-                    AppState.activeEvent.capacity++;
-                }
-                catch (error) {
-                    logger.error("[Selling Ticket]", error);
-                    Pop.error(error);
-                }
-            },
+      try {
+        let newTicket = {
+          eventId: AppState.activeEvent.id,
+          accountId: AppState.account.id
+        };
+        logger.log("buying the ticket", newTicket);
+        await ticketsService.create(newTicket);
+        AppState.activeEvent.capacity--;
+        }
+      catch (error) {
+        logger.error("[Buying Ticket]", error);
+        Pop.error(error);
+        }
+    },
+    async sellTicket() {
+      try {
+        let ticketToSell = AppState.ticketProfiles.find(t => t.accountId == AppState.account.id);
+        await ticketsService.sellTicket(ticketToSell.id);
+        AppState.activeEvent.capacity++;
+        }
+      catch (error) {
+        logger.error("[Selling Ticket]", error);
+        Pop.error(error);
+      }
+    },
     async cancelEvent(){
       try {
         let event = AppState.activeEvent
