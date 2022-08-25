@@ -2,48 +2,73 @@
   <div class="container-fluid">
     <section class="row">
       <div class="col-12">
-        <h1 class="text-center my-2">{{event.name}}</h1>
+        <h1 class="text-center mt-3">{{event.name}}</h1>
       </div>
-      <div class="col-12 col-md-6">
+      <div class="col-12 col-md-6 mt-3">
         <div class="card elevation-1">
           <div v-if="!event.isCanceled && event.capacity >= 1" class="card-body">
             <img class="img-fluid" :src="event.coverImg" alt="">
-            <p>{{event.location}}</p>
-            <p>{{event.type}}</p>
-            <p>{{event.startDate}}</p>
+            <p class="text-center mt-2">{{event.location}} - Tickets Available: {{event.capacity}}</p>
+            <p class="text-center">{{event.type}} - {{new Date(event.startDate).toLocaleDateString('en-US', {
+              month: 'short', day: 'numeric'
+            })}}</p>
             <p>{{event.description}}</p>
           </div>
           <div v-if="event.isCanceled" class="card-body">
             <img class="img-fluid canceled-img" :src="event.coverImg" alt="">
-            <p class="text-decoration-line-through">{{event.location}}</p>
-            <p class="text-decoration-line-through">{{event.type}}</p>
-            <p class="text-decoration-line-through">{{event.startDate}}</p>
+            <p class="text-center mt-2 text-decoration-line-through">{{event.location}} - Tickets Available: {{event.capacity}}</p>
+            <p class="text-center text-decoration-line-through">{{event.type}} - {{new Date(event.startDate).toLocaleDateString('en-US', {
+              month: 'short', day: 'numeric'
+            })}}</p>
             <p class="text-decoration-line-through">{{event.description}}</p>
             <p><strong class="text-danger">Canceled</strong></p>
           </div>
           <div v-if="event.capacity == 0" class="card-body">
             <img class="img-fluid canceled-img" :src="event.coverImg" alt="">
-            <p class="text-center mt-2">{{event.location}}</p>
-            <p class="">{{event.type}}</p>
-            <p class="">{{event.startDate}}</p>
+            <p class="text-center mt-2">{{event.location}} - Tickets Available: {{event.capacity}}</p>
+            <p class="text-center">{{event.type}} - {{new Date(event.startDate).toLocaleDateString('en-US', {
+              month: 'short', day: 'numeric'
+            })}}</p>
             <p class="">{{event.description}}</p>
             <p><strong class="text-danger">Sold Out</strong></p>
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-6">
+      <div class="col-12 col-md-6 mt-3">
         <div class="card elevation-1">
-          <h5>Comments:</h5>
+          <h5 class="text-center mt-2">Comments:</h5>
           <div class="card-body">
             <!-- PUT COMMENTS HERE -->
+            <div class="row" v-for="c in comments" :key="c.id">
+              <div class="mt-2">
+                <img :src="c.creator.picture" :title="c.creator.name" height="30" class="rounded-circle">
+                {{c.body}} - {{c.creator.name}} <i class="mdi mdi-delete selectable text-danger" @click="deleteComment(c)"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <form @submit.prevent="createComment">
+              <div class="mb-3">
+                <label for="comment" class="form-label">Comment:</label>
+                <textarea v-model="editable.body" class="form-control" id="comment" rows="3" placeholder="enter comment here..."></textarea>
+              </div>
+              <div class="text-end">
+              <button class="btn btn-info">Add Comment</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
-      <div class="col-8 offset-2">
+      <div class="col-8 offset-2 my-3">
         <div class="card elevation-1">
-          <h5>Attendees:</h5>
+          <h5 class="text-center mt-2">Attendees:</h5>
           <div class="card-body">
             <!-- PUT IMAGES OF TICKET HOLDERS HERE -->
+            <div class="row" v-for="t in ticketProfiles" :key="t.id">
+              <div>
+                <img :src="t.profile.picture" :title="t.profile.name" height="30" class="rounded-circle">
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -57,13 +82,14 @@ import { commentsService } from '../services/CommentsService';
 import { ticketsService } from '../services/TicketsService';
 import { logger } from '../utils/Logger';
 import Pop from '../utils/Pop';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { AppState } from '../AppState';
 import { useRoute } from 'vue-router';
 
 export default {
 setup() {
-  const route = useRoute();
+  const editable = ref({})
+  const route = useRoute()
   async function getEventById(){
     try {
       await eventsService.getById(route.params.eventId)
@@ -94,6 +120,7 @@ setup() {
     getTicketProfiles();
   })
   return {
+    editable,
     event: computed(() => AppState.activeEvent),
     comments: computed(() => AppState.comments),
     ticketProfiles: computed(() => AppState.ticketProfiles),
@@ -122,6 +149,30 @@ setup() {
         await ticketsService.sellTicket(ticketToSell.id)
       } catch (error) {
         logger.error('[Selling Ticket]', error)
+        Pop.error(error)
+      }
+    },
+    async createComment(){
+      try {
+        editable.value.eventId = route.params.eventId
+        await commentsService.create(editable.value)
+        editable.value = {}
+        Pop.success('Comment Added!')
+      } catch (error) {
+        logger.error('[Creating Comment]', error)
+        Pop.error(error)
+      }
+    },
+    async deleteComment(c){
+      try {
+        if(c.creator.id !== AppState.account.id){
+          throw new Error('You must be the creator of this comment to delete it.')
+        }
+        const yes = await Pop.confirm('Delete The Comment?')
+        if(!yes) {return}
+        await commentsService.deleteComment(c.id)
+      } catch (error) {
+        logger.error('[Deleting Comment]', error)
         Pop.error(error)
       }
     }
