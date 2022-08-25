@@ -6,6 +6,9 @@
         Tower
       </div>
     </router-link>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Create Event
+</button>
     <button
       class="navbar-toggler"
       type="button"
@@ -32,12 +35,79 @@
       <Login />
     </div>
   </nav>
+  <!-- Create Event Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form @submit.prevent="handleSubmit">
+          <div class="mb-3">
+            <label for="name" class="form-label">Event Name</label>
+            <input v-model="editable.name" type="text" class="form-control" id="name" aria-describedby="eventName">
+          </div>
+          <div class="mb-3">
+            <label for="coverImg" class="form-label">Event Image</label>
+            <input v-model="editable.coverImg" type="url" class="form-control" id="coverImg">
+          </div>
+          <div class="mb-3">
+            <label for="location" class="form-label">Event Location</label>
+            <input v-model="editable.location" type="text" class="form-control" id="location">
+          </div>
+          <div class="mb-3">
+            <label for="capacity" class="form-label">Event Capacity</label>
+            <input v-model="editable.capacity" type="text" class="form-control" id="capacity">
+          </div>
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Event Starting Date</label>
+            <input v-model="editable.startDate" type="date" class="form-control" id="startDate">
+          </div>
+          <select v-model="editable.type" class="form-select" aria-label="Default select example">
+            <option selected>Select Category</option>
+            <option value="concert">Concert</option>
+            <option value="convention">Convention</option>
+            <option value="sport">Sport</option>
+            <option value="digital">Digital</option>
+          </select>
+          <div class="mb-3">
+            <label for="description" class="form-label">Event Description</label>
+            <textarea v-model="editable.description" class="form-control" aria-label="eventDescription"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <script>
+import { ref } from 'vue';
+import { router } from '../router';
+import { eventsService } from '../services/EventsService';
+import { logger } from '../utils/Logger';
+import Pop from '../utils/Pop';
+
 export default {
   setup() {
-    return {};
+    const editable = ref({})
+    return {
+      editable,
+      async handleSubmit(){
+        try {
+          logger.log('creating or editing event', editable.value)
+          const event = await eventsService.createEvent(editable.value)
+          router.push({name: 'EventDetails', params: {eventId: event.id}})
+          editable.value = {}
+        } catch (error) {
+          logger.error('[Handling Submit]', error)
+          Pop.error(error)
+        }
+      }
+    };
   },
 };
 </script>

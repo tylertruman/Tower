@@ -4,18 +4,47 @@
     <img class="rounded" :src="account.picture" alt="" />
     <p>{{ account.email }}</p>
   </div>
+  <div class="container-fluid">
+    <section class="row">
+      <div class="col-12">
+        <h2>My Tickets</h2>
+      </div>
+    </section>
+    <section class="row">
+      <div class="col-md-4" v-for="t in accountTickets" :key="t.id">
+        <TicketCard :accountTicket="t"/>
+      </div>
+      <!-- Draw tickets here -->
+    </section>
+  </div>
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { AppState } from '../AppState'
+import { accountService } from '../services/AccountService'
+import { logger } from '../utils/Logger'
+import Pop from '../utils/Pop'
 export default {
   name: 'Account',
   setup() {
-    return {
-      account: computed(() => AppState.account)
+    async function getAccountTickets(){
+      try {
+        await accountService.getAccountTickets()
+      } catch (error) {
+        logger.error('[Getting Account Tickets]', error)
+        Pop.error(error)
+      }
     }
-  }
+    onMounted(() => {
+      getAccountTickets()
+    })
+    return {
+      account: computed(() => AppState.account),
+      accountTickets: computed(() => AppState.accountTickets)
+    }
+  },
+  // components: { EventCard }
 }
 </script>
 

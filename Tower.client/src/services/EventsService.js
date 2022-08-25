@@ -20,6 +20,12 @@ class EventsService{
     const res = await server.post('api/events', newEvent)
     logger.log('Create Event', res.data)
     AppState.events.unshift(res.data)
+    return res.data
+  }
+  async cancelEvent(eventId){
+    const res = await server.delete('api/events/'+eventId)
+    logger.log('Cancel Event', res.data)
+    return res.data
   }
 }
 
