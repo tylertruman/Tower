@@ -4,11 +4,11 @@
       <div class="col-12">
         filter <i class="mdi mdi-filter"></i>
       </div>
-      <div class="col-2 btn btn-info" @click="filterTerm = ''">All</div>
-      <div class="col-2 btn btn-info" @click="filterTerm = 'concert'">Concerts</div>
-      <div class="col-2 btn btn-info" @click="filterTerm = 'convention'">Conventions</div>
-      <div class="col-2 btn btn-info" @click="filterTerm = 'sport'">Sports</div>
-      <div class="col-2 btn btn-info" @click="filterTerm = 'digital'">Digital</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = ''">All</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'concert'">Concerts</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'convention'">Conventions</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'sport'">Sports</div>
+      <div class="col-7 col-md-2 btn btn-info mt-2" @click="filterTerm = 'digital'">Digital</div>
     </section>
     <section class="row">
     <div class="col-md-4" v-for="e in events" :key="e.id">
