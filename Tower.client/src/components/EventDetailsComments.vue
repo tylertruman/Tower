@@ -14,10 +14,10 @@
             <form @submit.prevent="createComment">
               <div class="mb-3">
                 <label for="comment" class="form-label">Comment:</label>
-                <textarea v-model="editable.body" class="form-control" id="comment" rows="3" placeholder="enter comment here..."></textarea>
+                <textarea v-model="editable.body" class="form-control" id="comment" rows="3" placeholder="enter comment here..." required></textarea>
               </div>
               <div class="text-end">
-              <button class="btn btn-info" title="Add Comment">Add Comment</button>
+              <button class="btn btn-primary" title="Add Comment">Add Comment</button>
               </div>
             </form>
           </div>
@@ -40,33 +40,36 @@ setup() {
     editable,
     comments: computed(() => AppState.comments),
     async createComment() {
-                try {
-                    editable.value.eventId = route.params.eventId;
-                    await commentsService.create(editable.value);
-                    editable.value = {};
-                    Pop.success("Comment Added!");
-                }
-                catch (error) {
-                    logger.error("[Creating Comment]", error);
-                    Pop.error(error);
-                }
-            },
-            async deleteComment(c) {
-                try {
-                    if (c.creator.id !== AppState.account.id) {
-                        throw new Error("You must be the creator of this comment to delete it.");
-                    }
-                    const yes = await Pop.confirm("Delete The Comment?");
-                    if (!yes) {
-                        return;
-                    }
-                    await commentsService.deleteComment(c.id);
-                }
-                catch (error) {
-                    logger.error("[Deleting Comment]", error);
-                    Pop.error(error);
-                }
-            }
+      try {
+        if(!AppState.account.id){
+          throw new Error('You must be signed in to create a comment')
+        }
+        editable.value.eventId = route.params.eventId;
+        await commentsService.create(editable.value);
+        editable.value = {};
+        Pop.success("Comment Created");
+        }
+        catch (error) {
+        logger.error("[Creating Comment]", error);
+        Pop.error(error);
+      }
+    },
+    async deleteComment(c) {
+      try {
+        if (c.creator.id !== AppState.account.id) {
+        throw new Error("You must be the creator of this comment to delete it.");
+        }
+        const yes = await Pop.confirm("Delete The Comment?");
+        if (!yes) {
+        return;
+        }
+        await commentsService.deleteComment(c.id);
+        }
+        catch (error) {
+        logger.error("[Deleting Comment]", error);
+        Pop.error(error);
+      }
+    }
   };
 },
 };

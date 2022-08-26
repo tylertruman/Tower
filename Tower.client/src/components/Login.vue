@@ -15,6 +15,7 @@
         data-bs-toggle="dropdown"
         aria-expanded="false"
         id="authDropdown"
+        title="Account Dropdown toggle"
       >
         <div v-if="account.picture || user.picture">
           <img

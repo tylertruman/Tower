@@ -12,9 +12,9 @@
     </section>
     <section class="row">
       <div class="col-md-4" v-for="t in accountTickets" :key="t.id">
+        <!-- Account Tickets -->
         <TicketCard :accountTicket="t"/>
       </div>
-      <!-- Draw tickets here -->
     </section>
   </div>
 </template>

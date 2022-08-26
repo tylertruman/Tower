@@ -6,12 +6,12 @@
             </div>
             <img class="img-fluid elevation-1 rounded" :src="event.coverImg" alt="event image">
             <p class="text-center mt-2">{{event.location}} - Tickets Available: {{event.capacity}}</p>
-            <p class="text-center">{{event.type}} - {{new Date(event.startDate).toLocaleDateString('en-US', {
+            <p class="text-center">{{event.type}} | {{new Date(event.startDate).toLocaleDateString('en-US', {
               month: 'short', day: 'numeric'
             })}}</p>
             <p>{{event.description}}</p>
             <div v-if="!hasTicket" class="text-center">
-            <button class="btn btn-info" @click="buyTicket" title="Buy Ticket">Buy Ticket</button>
+            <button class="btn btn-primary" @click="buyTicket" title="Buy Ticket">Buy Ticket</button>
             </div>
             <div v-else class="text-center">
             <button class="btn btn-danger" @click="sellTicket" title="Sell Ticket">Sell Ticket</button>
@@ -20,7 +20,7 @@
           <div v-if="event.isCanceled" class="card-body">
             <img class="img-fluid canceled-img elevation-1 rounded" :src="event.coverImg" alt="event image">
             <p class="text-center mt-2 text-decoration-line-through">{{event.location}} - Tickets Available: {{event.capacity}}</p>
-            <p class="text-center text-decoration-line-through">{{event.type}} - {{new Date(event.startDate).toLocaleDateString('en-US', {
+            <p class="text-center text-decoration-line-through">{{event.type}} | {{new Date(event.startDate).toLocaleDateString('en-US', {
               month: 'short', day: 'numeric'
             })}}</p>
             <p class="text-decoration-line-through">{{event.description}}</p>
@@ -29,7 +29,7 @@
           <div v-if="event.capacity == 0" class="card-body">
             <img class="img-fluid canceled-img elevation-1 rounded" :src="event.coverImg" alt="event image">
             <p class="text-center mt-2">{{event.location}} - Tickets Available: {{event.capacity}}</p>
-            <p class="text-center">{{event.type}} - {{new Date(event.startDate).toLocaleDateString('en-US', {
+            <p class="text-center">{{event.type}} | {{new Date(event.startDate).toLocaleDateString('en-US', {
               month: 'short', day: 'numeric'
             })}}</p>
             <p class="">{{event.description}}</p>
@@ -59,13 +59,16 @@ setup() {
     }),
     async buyTicket() {
       try {
+        if(!AppState.account.id){
+          throw new Error('You must be signed in to buy a ticket')
+        }
         let newTicket = {
           eventId: AppState.activeEvent.id,
           accountId: AppState.account.id
         };
-        logger.log("buying the ticket", newTicket);
         await ticketsService.create(newTicket);
         AppState.activeEvent.capacity--;
+        Pop.success('Ticket Purchase Successful')
         }
       catch (error) {
         logger.error("[Buying Ticket]", error);
@@ -77,6 +80,7 @@ setup() {
         let ticketToSell = AppState.ticketProfiles.find(t => t.accountId == AppState.account.id);
         await ticketsService.sellTicket(ticketToSell.id);
         AppState.activeEvent.capacity++;
+        Pop.success('Ticket Sale Successful')
         }
       catch (error) {
         logger.error("[Selling Ticket]", error);
@@ -88,6 +92,7 @@ setup() {
         let event = AppState.activeEvent
         await eventsService.cancelEvent(event.id)
         AppState.activeEvent.isCanceled = true
+        Pop.success('Event Cancellation Successful')
       } catch (error) {
         logger.error('[Cancelling Event]', error)
         Pop.error(error)

@@ -14,7 +14,6 @@ class AccountService {
   async getAccountTickets(){
     const res = await server.get('/account/tickets')
     AppState.accountTickets = res.data
-    logger.error('Account Tickets', res.data)
   }
 }
 

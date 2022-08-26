@@ -1,7 +1,7 @@
 <template>
   <div class="mt-3 elevation-1 rounded selectable card" @click="goTo" :title="event.name">
     <div class="card-body">
-      <img class="img-fluid" :src="event.coverImg">
+      <img class="img-fluid" :src="event.coverImg" alt="Event Image">
       <h5 class="text-center mb-0 mt-3">{{event.name}}</h5>
     </div>
   </div>
